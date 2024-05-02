@@ -1,0 +1,41 @@
+# Dependencias
+node_modules/
+
+# Archivos de registro
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directorios de runtime
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Directorio de salida de la compilación
+dist
+build
+out
+
+# Archivos de configuración de herramientas de desarrollo
+.eslintcache
+.tscache
+.jest/
+
+# Sistema de archivos de MacOS
+.DS_Store
+
+# Sistema de archivos de Windows
+Thumbs.db
+
+# Archivos de entorno
+.env
+.env.test
+
+# Archivos de volcado de crash
+*.core
+
+# Directorio opcional para definir archivos de configuración personalizados, que no deberían ir al repositorio
+config/dev.exs
+config/test.exs
+config/prod.secret.exs
