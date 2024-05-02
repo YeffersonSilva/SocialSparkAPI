@@ -1,5 +1,11 @@
-// Connection to the database
+//import dependencies
 
+const connection= requiere('./database/connection')
+
+
+
+// Connection to the database
+connection();
 
 
 //create a connection to the database
