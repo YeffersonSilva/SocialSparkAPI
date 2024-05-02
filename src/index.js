@@ -1,6 +1,6 @@
 //import dependencies
 
-const connection= requiere('./database/connection')
+const connection= require('./database/connection.js')
 const express = require('express');
 const cors = require('cors');
 
@@ -22,6 +22,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // loading config routes
+
+
+//router test
+app.get('/', (req, res) => {
+    res.status(200).json({
+        "id": 1,
+        "nombre": "yefferson"
+    });
+})
 
 // put server  listing petitions http
 
