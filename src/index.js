@@ -1,8 +1,7 @@
 //import dependencies
-
-const connection= require('./database/connection.js')
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import connection from './database/connection.js';
 
 
 // Connection to the database
@@ -20,6 +19,7 @@ app.use(cors());
 // convert data the body a object the json
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 // loading config routes
 
