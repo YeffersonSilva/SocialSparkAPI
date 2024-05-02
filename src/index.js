@@ -1,7 +1,12 @@
 //import dependencies
-import express from 'express';
-import cors from 'cors';
-import connection from './database/connection.js';
+
+
+const connection= require('./database/connection.js')
+const express = require('express');
+const cors = require('cors');
+
+const userRoutes = require('./routes/user.routes');
+
 
 
 // Connection to the database
@@ -22,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // loading config routes
-
+app.use('/api/user', userRoutes);
 
 //router test
 app.get('/', (req, res) => {
