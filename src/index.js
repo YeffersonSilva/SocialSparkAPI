@@ -5,8 +5,9 @@ const connection= require('./database/connection.js')
 const express = require('express');
 const cors = require('cors');
 
-const userRoutes = require('./routes/user.routes');
-
+const UserRoutes = require('./routes/user.routes');
+const PublicacionRoutes = require('./routes/publicacion.routes');
+const FollowRoutes = require('./routes/follow.routes');
 
 
 // Connection to the database
@@ -27,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // loading config routes
-app.use('/api/user', userRoutes);
+app.use('/api', UserRoutes);
 
 //router test
 app.get('/', (req, res) => {
