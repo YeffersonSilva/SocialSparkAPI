@@ -1,4 +1,3 @@
-// action test
 const User = require("../models/User.js");
 const bcrypt = require("bcrypt");
 
@@ -10,60 +9,64 @@ const testUser = (req, res) => {
 
 // Register of user
 const register = (req, res) => {
-  //get data of user
+  // Get data of user
   const params = req.body;
-  // check validate data
+  // Check validate data
   if (!params.name || !params.email || !params.password || !params.nick) {
     return res.status(400).json({
       status: "error",
       message: "All fields are required",
     });
   }
-  //create object user
 
-
-  // check if user exist
-
+  // Check if user exists
   User.find({
     $or: [
       { email: params.email.toLowerCase() },
-      { nick: params.nicktoLowerCase },
+      { nick: params.nick.toLowerCase() },
     ],
-  }).exec(async(err, users) => {
-    if (err) {
-      return res.status(500).json({
-        status: "error",
-        message: "Error in the request",
-      });
-    }
-    if (users && users.length >= 1) {
-      return res.status(200).send({
-        status: "error",
-        message: "User already exists",
-      });
-    } 
+  }).exec(async (err, users) => {
+      if (err) {
+          return res.status(500).json({
+              status: "error",
+              message: "Error in the request",
+          });
+      }
+      if (users && users.length >= 1) {
+          return res.status(409).json({ // Changed status code to 409 Conflict
+              status: "error",
+              message: "User already exists",
+          });
+      }
  
-  // password encryption
-    let pwd = await bcrypt.hash(params.password, 10)
-    params.password = pwd;
-    
-    let userToSave = new User(params);
+      // Password encryption
+      const pwd = await bcrypt.hash(params.password, 10);
+      const userToSave = new User({
+          ...params,
+          password: pwd
+      });
 
-        userToSave.password = pwd;
-        // save user in database
-       
-            // return response
-            return res.status(200).json({
-                status: "success",
-                message: "User saved",
-                userToSave,
-            });
-        });
-  // save user in database
-
-  // return response
-
-
-};
+      // Save user in database
+      userToSave.save((err, userStored) => {
+          if (err) {
+              return res.status(500).json({
+                  status: "error",
+                  message: "Error saving user",
+              });
+          }
+          // Return response excluding sensitive data
+          return res.status(201).json({ // Status code changed to 201 Created
+              status: "success",
+              message: "User registered successfully",
+              user: {
+                id: userStored._id,
+                name: userStored.name,
+                email: userStored.email,
+                nick: userStored.nick
+              }
+          });
+      });
+  });
+}
 
 module.exports = { testUser, register };
