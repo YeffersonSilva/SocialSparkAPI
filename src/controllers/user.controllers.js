@@ -69,4 +69,31 @@ const register = (req, res) => {
   });
 }
 
-module.exports = { testUser, register };
+
+const login = (req, res) => {
+    //get params body
+    let params = req.body;
+
+
+    if (!params.email || !params.password) {
+        return res.status(400).json({
+            status: "error",
+            message: "All fields are required",
+        });
+    }
+    // search user in database
+    User.findOne({ email: params.email }, (err, user) => {
+
+    //check if password is correct
+
+    // return token
+    
+    // return data is user
+
+    return res.status(200).json({
+        status: "success",
+        message: "User logged in successfully",
+    })
+}
+
+module.exports = { testUser, register ,login};
