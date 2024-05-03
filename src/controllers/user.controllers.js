@@ -1,6 +1,6 @@
 // action test
 const User = require("../models/User.js");
-const bcrypt = require("bcrypt-nodejs");
+const bcrypt = require("bcrypt");
 
 const testUser = (req, res) => {
   return res.status(200).json({
@@ -20,16 +20,16 @@ const register = (req, res) => {
     });
   }
   //create object user
-  let userToSave = new User(params);
+
 
   // check if user exist
 
-  User.finde({
+  User.find({
     $or: [
-      { email: userToSave.email.toLowerCase() },
-      { nick: userToSave.nicktoLowerCase },
+      { email: params.email.toLowerCase() },
+      { nick: params.nicktoLowerCase },
     ],
-  }).exec((err, users) => {
+  }).exec(async(err, users) => {
     if (err) {
       return res.status(500).json({
         status: "error",
@@ -41,23 +41,29 @@ const register = (req, res) => {
         status: "error",
         message: "User already exists",
       });
-    } else {
-        
-    }
-  });
+    } 
+ 
   // password encryption
+    let pwd = await bcrypt.hash(params.password, 10)
+    params.password = pwd;
+    
+    let userToSave = new User(params);
 
+        userToSave.password = pwd;
+        // save user in database
+       
+            // return response
+            return res.status(200).json({
+                status: "success",
+                message: "User saved",
+                userToSave,
+            });
+        });
   // save user in database
 
   // return response
 
-  return res.status(200).json({
-    status: "succes",
 
-    message: "Register user",
-    params,
-    userToSave,
-  });
 };
 
-const ejempñ = (module.exports = { testUser, register });
+module.exports = { testUser, register };
