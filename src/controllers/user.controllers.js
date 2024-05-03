@@ -11,9 +11,18 @@ const testUser = (req, res) => {
 // Register of user 
 const register = (req, res) => {
     //get data of user
-    const {name, surname, nick, email, password} = req.body;
+    const params = req.body;
     // check validate data
-
+    if (!params.name || !params.email || !params.password || !params.nick) {
+        return res.status(400).json({
+            status: "error",
+            message: "All fields are required",
+        });
+    
+    } 
+    //create object user
+    let userToSave = new User(params);
+    
     // check if user exist
 
     // password encryption
@@ -23,8 +32,11 @@ const register = (req, res) => {
     // return response
 
     return res.status(200).json({
+        status: "succes",
+
         message: "Register user",
-        params
+        params,
+        userToSave
     });
 }
 
