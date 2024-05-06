@@ -7,7 +7,7 @@ require('dotenv').config();
 const SECRET_KEY = process.env.SECRET_KEY_JWT;
 
 // create a function to generate a token
-const createToken = (user) => {
+exports.createToken = (user) => {
     const payload = {
         id: user._id,
         name: user.name,
@@ -24,6 +24,3 @@ const createToken = (user) => {
     return jwt.encode(payload, SECRET_KEY);
 };
 
-module.exports = {
-    createToken
-};
