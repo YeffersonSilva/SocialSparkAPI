@@ -1,6 +1,7 @@
 //impot dependencies
 const jwt = require('jwt-simple');
 const moment = require('moment');
+require('dotenv').config();
 
 //ket secret
 const SECRET_KEY = process.env.SECRET_KEY_JWT;
@@ -14,7 +15,7 @@ const createToken = (user) => {
         nick: user.nick,
         email: user.email,
         role: user.role,
-        image: user.image,
+        imagen: user.image,
         iat: moment().unix(),
         exp: moment().add(30, 'days').unix()
     };

@@ -1,6 +1,8 @@
 const User = require("../models/User.js");
 const bcrypt = require("bcrypt");
 
+const jwt = require("../services/jwt.js");
+
 const testUser = (req, res) => {
   return res.status(200).json({
     message: "Hello world user",
@@ -102,7 +104,7 @@ const login = (req, res) => {
       }
 
        // return token
-      const token= false
+      const token= jwt.createToken(user);
       // return data is user
       
       return res.status(200).json({
