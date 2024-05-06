@@ -83,7 +83,7 @@ const login = (req, res) => {
 
   // Buscar usuario en la base de datos
   User.findOne({ email: params.email })
-    .select({ password: 0 })
+    //.select({ password: 0 })
     .exec((err, user) => {
       if (err || !user) {
         return res.status(500).json({
@@ -93,6 +93,12 @@ const login = (req, res) => {
       }
 
       //check if password is correct
+      let pwd = bcrypt.compareSync(params.password, user.password);
+      if (!pwd) {
+        return res.status(400).json({
+          status: "error",
+          message: "Incorrect password",
+        });
 
        // return token
     
@@ -109,4 +115,4 @@ const login = (req, res) => {
 
 module.exports = { testUser, register ,login};
 
-    /
+    
