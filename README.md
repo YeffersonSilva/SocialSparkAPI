@@ -26,3 +26,7 @@ npm start
 This will launch the API on localhost with the default port.
 
 
+Additionally, you can also run the API using Docker Compose. Ensure you have Docker and Docker Compose installed on your system. Then, navigate to the project directory and run:
+
+```bash
+docker-compose up
