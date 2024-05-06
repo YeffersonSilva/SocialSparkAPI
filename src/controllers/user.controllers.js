@@ -71,29 +71,41 @@ const register = (req, res) => {
 
 
 const login = (req, res) => {
-    //get params body
-    let params = req.body;
+  // Obtener los parámetros del cuerpo de la solicitud
+  let params = req.body;
 
+  if (!params.email || !params.password) {
+    return res.status(400).send({
+      status: "error",
+      message: "All fields are required",
+    });
+  }
 
-    if (!params.email || !params.password) {
-        return res.status(400).json({
-            status: "error",
-            message: "All fields are required",
+  // Buscar usuario en la base de datos
+  User.findOne({ email: params.email })
+    .select({ password: 0 })
+    .exec((err, user) => {
+      if (err || !user) {
+        return res.status(500).json({
+          status: "error",
+          message: "Error in the request",
         });
-    }
-    // search user in database
-    User.findOne({ email: params.email }, (err, user) => {
+      }
 
-    //check if password is correct
+      // Verificar si la contraseña es correcta
+      // (Aquí debes agregar tu lógica para verificar la contraseña)
 
-    // return token
-    
-    // return data is user
+      // Devolver token
+      // (Aquí debes agregar tu lógica para generar y devolver un token)
 
-    return res.status(200).json({
+      // Devolver datos del usuario
+      return res.status(200).json({
         status: "success",
         message: "User logged in successfully",
-    })
-}
+        user,
+      });
+    });
+};
+
 
 module.exports = { testUser, register ,login};
