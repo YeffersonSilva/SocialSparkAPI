@@ -92,13 +92,12 @@ const login = (req, res) => {
         });
       }
 
-      // Verificar si la contraseña es correcta
-      // (Aquí debes agregar tu lógica para verificar la contraseña)
+      //check if password is correct
 
-      // Devolver token
-      // (Aquí debes agregar tu lógica para generar y devolver un token)
-
-      // Devolver datos del usuario
+       // return token
+    
+      // return data is user
+      
       return res.status(200).json({
         status: "success",
         message: "User logged in successfully",
@@ -109,3 +108,5 @@ const login = (req, res) => {
 
 
 module.exports = { testUser, register ,login};
+
+    /
