@@ -220,14 +220,14 @@ const update = async (req, res) => {
       userToUpdate,
       { new: true },
       (err, userUpdated) => {
-        if (err) {
+        if (err || !userUpdated) {
           return res.status(500).json({
             status: "error",
             message: "Error updating user",
           });
         }
 
-        // Eliminar datos sensibles
+        // delete data is sensitive
         userUpdated.password = undefined;
 
         return res.status(200).json({
