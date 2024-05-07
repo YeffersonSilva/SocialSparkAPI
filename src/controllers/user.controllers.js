@@ -177,9 +177,80 @@ const list = (req, res) => {
         page,
         itemsPerPage,
         total,
-        pages:false
+        pages:Math.ceil(total / itemsPerPage)
       });
     });
 };
 
-module.exports = { testUser, register, login, profile, list };
+const update = async (req, res) => {
+  try {
+    // Obtener información del usuario a actualizar
+    let userToUpdate = req.body;
+    let userIdentity = req.user;
+
+    // Eliminar datos sensibles
+    delete userToUpdate.iat;
+    delete userToUpdate.exp;
+    delete userToUpdate.role;
+    delete userToUpdate.image;
+
+    // Verificar si el usuario ya existe
+    const existingUser = await User.findOne({
+      $or: [
+        { email: userToUpdate.email.toLowerCase() },
+        { nick: userToUpdate.nick.toLowerCase() },
+      ],
+    });
+
+    if (existingUser && existingUser._id != userIdentity.id) {
+      return res.status(409).json({
+        status: "error",
+        message: "User already exists",
+      });
+    }
+
+    // Si se proporciona una nueva contraseña, encriptarla
+    if (userToUpdate.password) {
+      const hashedPassword = await bcrypt.hash(userToUpdate.password, 10);
+      userToUpdate.password = hashedPassword;
+    }
+
+    User.findByIdAndUpdate(
+      userIdentity.id,
+      userToUpdate,
+      { new: true },
+      (err, userUpdated) => {
+        if (err) {
+          return res.status(500).json({
+            status: "error",
+            message: "Error updating user",
+          });
+        }
+
+        // Eliminar datos sensibles
+        userUpdated.password = undefined;
+
+        return res.status(200).json({
+          status: "success",
+          message: "User updated successfully",
+          user: userUpdated,
+        });
+      }
+    );
+    return res.status(200).json({
+      status: "success",
+      message: "User updated successfully",
+      user: userToUpdate,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
+};
+
+
+
+
+module.exports = { testUser, register, login, profile, list ,update};
