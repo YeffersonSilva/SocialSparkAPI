@@ -128,7 +128,9 @@ const profile = (req, res) => {
   const userId = req.params.id;
 
   // Find user in database
-  User.findById(userId, (err, user) => {
+  User.findById(userId)
+  .select({ password: 0, role: 0 })
+  .exec((err, user) => {
       if (err || !user) {
           return res.status(404).json({
               status: "error",
@@ -144,6 +146,6 @@ const profile = (req, res) => {
   });
 } 
 
-module.exports = { testUser, register ,login};
+module.exports = { testUser, register ,login, profile};
 
     
