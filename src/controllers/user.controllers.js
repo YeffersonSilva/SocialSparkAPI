@@ -2,6 +2,7 @@ const User = require("../models/User.js");
 const bcrypt = require("bcrypt");
 
 const jwt = require("../services/jwt.js");
+const mongosePagination = require("mongoose-pagination");
 
 const testUser = (req, res) => {
   return res.status(200).json({
@@ -28,49 +29,50 @@ const register = (req, res) => {
       { nick: params.nick.toLowerCase() },
     ],
   }).exec(async (err, users) => {
+    if (err) {
+      return res.status(500).json({
+        status: "error",
+        message: "Error in the request",
+      });
+    }
+    if (users && users.length >= 1) {
+      return res.status(409).json({
+        // Changed status code to 409 Conflict
+        status: "error",
+        message: "User already exists",
+      });
+    }
+
+    // Password encryption
+    const pwd = await bcrypt.hash(params.password, 10);
+    const userToSave = new User({
+      ...params,
+      password: pwd,
+    });
+
+    // Save user in database
+    userToSave.save((err, userStored) => {
       if (err) {
-          return res.status(500).json({
-              status: "error",
-              message: "Error in the request",
-          });
+        return res.status(500).json({
+          status: "error",
+          message: "Error saving user",
+        });
       }
-      if (users && users.length >= 1) {
-          return res.status(409).json({ // Changed status code to 409 Conflict
-              status: "error",
-              message: "User already exists",
-          });
-      }
- 
-      // Password encryption
-      const pwd = await bcrypt.hash(params.password, 10);
-      const userToSave = new User({
-          ...params,
-          password: pwd
+      // Return response excluding sensitive data
+      return res.status(201).json({
+        // Status code changed to 201 Created
+        status: "success",
+        message: "User registered successfully",
+        user: {
+          id: userStored._id,
+          name: userStored.name,
+          email: userStored.email,
+          nick: userStored.nick,
+        },
       });
-
-      // Save user in database
-      userToSave.save((err, userStored) => {
-          if (err) {
-              return res.status(500).json({
-                  status: "error",
-                  message: "Error saving user",
-              });
-          }
-          // Return response excluding sensitive data
-          return res.status(201).json({ // Status code changed to 201 Created
-              status: "success",
-              message: "User registered successfully",
-              user: {
-                id: userStored._id,
-                name: userStored.name,
-                email: userStored.email,
-                nick: userStored.nick
-              }
-          });
-      });
+    });
   });
-}
-
+};
 
 const login = (req, res) => {
   // Obtener los parámetros del cuerpo de la solicitud
@@ -103,10 +105,10 @@ const login = (req, res) => {
         });
       }
 
-       // return token
-      const token= jwt.createToken(user);
+      // return token
+      const token = jwt.createToken(user);
       // return data is user
-      
+
       return res.status(200).json({
         status: "success",
         message: "User logged in successfully",
@@ -114,14 +116,12 @@ const login = (req, res) => {
           id: user._id,
           name: user.name,
           email: user.email,
-          nick: user.nick
+          nick: user.nick,
         },
-        token
-
+        token,
       });
     });
 };
-
 
 const profile = (req, res) => {
   // Get user id
@@ -129,23 +129,57 @@ const profile = (req, res) => {
 
   // Find user in database
   User.findById(userId)
-  .select({ password: 0, role: 0 })
-  .exec((err, user) => {
+    .select({ password: 0, role: 0 })
+    .exec((err, user) => {
       if (err || !user) {
-          return res.status(404).json({
-              status: "error",
-              message: "User not found",
-          });
+        return res.status(404).json({
+          status: "error",
+          message: "User not found",
+        });
       }
 
       // Return user data
       return res.status(200).json({
-          status: "success",
-          user
+        status: "success",
+        user,
       });
-  });
-} 
+    });
+};
 
-module.exports = { testUser, register ,login, profile};
+const list = (req, res) => {
+  // Get page
 
-    
+  const page = req.params.page ? parseInt(req.params.page) : 1;
+
+  //consult with pagination
+  let itemsPerPage = 5;
+
+  User.find()
+    .sort("_id")
+    .paginate(page, itemsPerPage, (err, users, total) => {
+      if (err) {
+        return res.status(500).json({
+          status: "error",
+          message: "Error in the request",
+        });
+      }
+      if (!users) {
+        return res.status(404).json({
+          status: "error",
+          message: "No users to show",
+        });
+      }
+
+      // Return user data
+      return res.status(200).json({
+        status: "success",
+        users,
+        page,
+        itemsPerPage,
+        total,
+        pages:false
+      });
+    });
+};
+
+module.exports = { testUser, register, login, profile, list };
