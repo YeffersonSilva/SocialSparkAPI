@@ -7,6 +7,8 @@ router.get('/user', testUser);
 
 router.post('/register', register);
 
-router.post('/login',auth, login)
+router.post('/login', login)
+
+router.get('/profile/:id', auth, profile);
 
 module.exports = router;

@@ -123,6 +123,27 @@ const login = (req, res) => {
 };
 
 
+const profile = (req, res) => {
+  // Get user id
+  const userId = req.params.id;
+
+  // Find user in database
+  User.findById(userId, (err, user) => {
+      if (err || !user) {
+          return res.status(404).json({
+              status: "error",
+              message: "User not found",
+          });
+      }
+
+      // Return user data
+      return res.status(200).json({
+          status: "success",
+          user
+      });
+  });
+} 
+
 module.exports = { testUser, register ,login};
 
     
