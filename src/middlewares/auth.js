@@ -27,6 +27,7 @@ exports.auth = (req, res, next) => {
         if (payload.exp <= moment().unix()) {
             return res.status(404).send({ status:"error", message: 'The token has expired' });
         }
+        req.user = payload;
     }catch (error) {
         return res.status(404).send({ status:"error", message: 'The token is invalid' });
     }
@@ -35,7 +36,7 @@ exports.auth = (req, res, next) => {
 
 // add data is user request
 
-    req.user = payload;
+   
     next();
 
 };
