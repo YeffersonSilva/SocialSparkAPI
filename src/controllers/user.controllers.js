@@ -254,6 +254,4 @@ const update = async (req, res) => {
 };
 
 
-
-
 module.exports = { testUser, register, login, profile, list ,update};
