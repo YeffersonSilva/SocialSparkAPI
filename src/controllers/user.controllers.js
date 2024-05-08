@@ -226,14 +226,6 @@ const update = async (req, res) => {
           message: "Error updating user",
         });
       }
-    } catch (error) {
-      return res.status(500).json({
-        status: "error",
-        message: "Error updating user",
-      });
-    }
-   
-
         // delete data is sensitive
         userUpdated.password = undefined;
 
@@ -242,6 +234,15 @@ const update = async (req, res) => {
           message: "User updated successfully",
           user: userUpdated,
         });
+    } catch (error) {
+      return res.status(500).json({
+        status: "error",
+        message: "Error updating user",
+      });
+    }
+   
+
+      
       
    
   } catch (error) {
