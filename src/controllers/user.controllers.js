@@ -214,18 +214,25 @@ const update = async (req, res) => {
       const hashedPassword = await bcrypt.hash(userToUpdate.password, 10);
       userToUpdate.password = hashedPassword;
     }
-
-    User.findByIdAndUpdate(
-      userIdentity.id,
-      userToUpdate,
-      { new: true },
-      (err, userUpdated) => {
-        if (err || !userUpdated) {
-          return res.status(500).json({
-            status: "error",
-            message: "Error updating user",
-          });
-        }
+    try {
+      let userUpdate =  await User.findByIdAndUpdate(
+        userIdentity.id,
+        userToUpdate,
+        { new: true })
+          
+      if (err || !userUpdated) {
+        return res.status(500).json({
+          status: "error",
+          message: "Error updating user",
+        });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        status: "error",
+        message: "Error updating user",
+      });
+    }
+   
 
         // delete data is sensitive
         userUpdated.password = undefined;
@@ -235,13 +242,8 @@ const update = async (req, res) => {
           message: "User updated successfully",
           user: userUpdated,
         });
-      }
-    );
-    return res.status(200).json({
-      status: "success",
-      message: "User updated successfully",
-      user: userToUpdate,
-    });
+      
+   
   } catch (error) {
     return res.status(500).json({
       status: "error",
