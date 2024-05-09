@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 
 exports.upload = (req, res) => {
 
@@ -12,7 +14,11 @@ exports.upload = (req, res) => {
     const extension = imageSplit[imageSplit.length - 1];
 
     if (extension !== "png" && extension !== "jpg" && extension !== "jpeg") {
+        const filePath = req.filePath;
+        const fileDelete= fs.unlinkSync(filePath);
+
         return res.status(400).json({
+            status: "error",
             message: "Invalid file format"
         });
     }
