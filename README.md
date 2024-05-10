@@ -1,6 +1,7 @@
 # SocialSparkAPI
 
 Welcome to SocialSparkAPI, a RESTful API designed using Node.js for a social networking service. This API supports a variety of features essential for a social media platform, including user management, posting, and interactions.
+![Captura de pantalla 2024-05-10 154715](https://github.com/YeffersonSilva/SocialSparkAPI/assets/117882117/b0f057f2-1f37-4bc2-9fb5-2b14c33145b8)
 
 ## Features
 
