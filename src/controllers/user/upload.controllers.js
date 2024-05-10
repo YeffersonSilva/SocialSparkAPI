@@ -1,4 +1,5 @@
 const fs = require("fs");
+const User = require("../../models/User");
 
 exports.upload = (req, res) => {
   if (!req.file && !req.files) {

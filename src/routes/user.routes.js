@@ -39,6 +39,6 @@ router.get('/profile/:id', check.auth, profile);
 router.get('/list/:page?', list);
 router.put('/update', check.auth, update);
 router.post('/upload', [check.auth, uploads.single("file0")], upload);
-router.get('/avatar/:file', avatar);
+router.get('/avatar/:file', check.auth, avatar);
 
 module.exports = router;
