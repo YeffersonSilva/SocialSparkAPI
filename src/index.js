@@ -7,7 +7,7 @@ require('dotenv').config();
 
 const UserRoutes = require("./routes/user.routes");
 const PublicacionRoutes = require("./routes/publication.routes.js");
-const FollowRoutes = require("./routes/follow.routes");
+const FollowRoutes = require("./routes/follow.routes.js");
 
 // Connection to the database
 connection();
@@ -27,7 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 // loading config routes
 app.use("/api/user", UserRoutes);
 //app.use('/api/publication', PublicacionRoutes);
-//app.use('/api/follow', FollowRoutes);
+app.use('/api/follow', FollowRoutes);
+
 
 //router test
 app.get("/", (req, res) => {

@@ -1,9 +1,4 @@
-const testFollow = (req, res) => {
-    return res.status(200).json({
-        message: "Hello world user"
-    });
-}
+const Follow = require('../../models/follow/follow.model');
+const User = require('../../models/user/user.model');
 
-module.exports = {
-    testFollow
-}
+
