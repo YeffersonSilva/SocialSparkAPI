@@ -1,4 +1,5 @@
 const User = require("../../models/User");
+const followService =require("../../services/followServices")
 
 const mongosePagination = require("mongoose-pagination");
 
@@ -12,7 +13,7 @@ exports.list = (req, res) => {
   
     User.find()
       .sort("_id")
-      .paginate(page, itemsPerPage, (err, users, total) => {
+      .paginate(page, itemsPerPage, async(err, users, total) => {
         if (err) {
           return res.status(500).json({
             status: "error",
@@ -25,7 +26,8 @@ exports.list = (req, res) => {
             message: "No users to show",
           });
         }
-  
+        const followInfo =await followService.followThisUser(req.user.sub, userId);
+
         // Return user data
         return res.status(200).json({
           status: "success",
@@ -33,7 +35,9 @@ exports.list = (req, res) => {
           page,
           itemsPerPage,
           total,
-          pages:Math.ceil(total / itemsPerPage)
+          pages: Math.ceil(total / itemsPerPage),
+          following: followInfo.following,
+          follower: followInfo.follower
         });
       });
   };
