@@ -3,6 +3,7 @@ const User = require("../../models/User");
 
 const mongoosePaginate = require("mongoose-pagination");
 
+const followServices = require("../../services/followServices");
 
 exports.following = (req, res) => {
     let userId = req.user;
@@ -15,15 +16,19 @@ exports.following = (req, res) => {
     
     const itemsPerPage = 5;
 
-    Follow.find({ user: userId }).populate("user followed", "-password -role -__v")
-        .paginate(page, itemsPerPage, (err, follows, total) => {
+    Follow.find({ user: userId })
+        .populate("user followed", "-password -role -__v")
+        .paginate(page, itemsPerPage, async(err, follows, total) => {
             if (err) return res.status(500).send({ message: "Error en el servidor" });
             if (!follows) return res.status(404).send({ message: "No estas siguiendo a ningún usuario" });
+
+           let followUserIds = await followServices(req.user.userid)
 
             return res.status(200).send({
                 total: total,
                 pages: Math.ceil(total / itemsPerPage),
-                follows
+                follows,
+                users_following: followUserIds.following,
             });
         });
 }
