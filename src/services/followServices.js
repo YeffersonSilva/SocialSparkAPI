@@ -46,4 +46,16 @@ const followServices = async (userId) => {
   return res.status(200).send({ status: "success", following: followingClean, followed: followedClean, followers: followers });
 };
 
-module.exports = followServices;
+const followThisUser = async (identify, profileUserid) => {
+
+  let following = await Follow.findOne({ "user": identify, "followed": profileUserid })
+    .select({ "followed": 1, "_id": 0 })
+    .exec()
+  
+  let follower = await Follow.findOne({ "user": profileUserid, "followed": identify })
+    .select({ "user": 1, "_id": 0 })
+    .exec()
+ return { following, follower } 
+}
+
+module.exports = { followServices, followThisUser}
