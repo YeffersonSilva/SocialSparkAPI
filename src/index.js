@@ -26,8 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // loading config routes
 app.use("/api/user", UserRoutes);
-//app.use('/api/publication', PublicacionRoutes);
+app.use('/api/publication', PublicacionRoutes);
 app.use('/api/follow', FollowRoutes);
+
 
 
 //router test
