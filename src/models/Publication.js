@@ -8,8 +8,8 @@ const PublicationSchema = new Schema({
         ref: 'User'
     },
     text: {
-        String,
-        require
+        type: String,
+        required: true
     },
     file: String,
     createAt: {
