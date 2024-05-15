@@ -1,35 +1,39 @@
 const Follow = require("../../models/Follow");
-const User = require("../../models/User");
-
+const followServices = require("../../services/followServices");
 const mongoosePaginate = require("mongoose-pagination");
 
-const followServices = require("../../services/followServices");
+exports.following = async (req, res) => {
+  let userId = req.params.id || req.user.id;
+  let page = req.params.page || 1;
+  const itemsPerPage = 5;
 
-exports.following = (req, res) => {
-    let userId = req.user;
-    
-    if (req.params.id) userId = req.params.id;
+  try {
+    // Find following users with pagination
+    const follows = await Follow.find({ user: userId })
+      .populate("user followed", "-password -role -__v")
+      .paginate(page, itemsPerPage);
 
-    let page = 1;
+    if (!follows.length) {
+      return res.status(404).json({
+        status: "error",
+        message: "You are not following any users",
+      });
+    }
 
-    if (req.params.page) page = req.params.page;
-    
-    const itemsPerPage = 5;
+    // Get follow information
+    const followUserIds = await followServices(req.user.id);
 
-    Follow.find({ user: userId })
-        .populate("user followed", "-password -role -__v")
-        .paginate(page, itemsPerPage, async(err, follows, total) => {
-            if (err) return res.status(500).send({ message: "Error en el servidor" });
-            if (!follows) return res.status(404).send({ message: "No estas siguiendo a ningún usuario" });
-
-           let followUserIds = await followServices(req.user.userid)
-
-            return res.status(200).send({
-                total: total,
-                pages: Math.ceil(total / itemsPerPage),
-                follows,
-                users_following: followUserIds.following,
-            });
-        });
-}
-        
+    return res.status(200).json({
+      status: "success",
+      total: follows.total,
+      pages: Math.ceil(follows.total / itemsPerPage),
+      follows,
+      users_following: followUserIds.following,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Error fetching following users",
+    });
+  }
+};
