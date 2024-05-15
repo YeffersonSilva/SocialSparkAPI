@@ -1,46 +1,46 @@
-//import dependencies
-
+// Import dependencies
 const connection = require("./database/connection.js");
 const express = require("express");
 const cors = require("cors");
 require('dotenv').config();
 
 const UserRoutes = require("./routes/user.routes");
-const PublicacionRoutes = require("./routes/publication.routes.js");
+const PublicationRoutes = require("./routes/publication.routes.js");
 const FollowRoutes = require("./routes/follow.routes.js");
 
-// Connection to the database
+const { errorHandler } = require('./middlewares/errorHandler');
+
+// Connect to the database
 connection();
 
-//create a connection to server
-
+// Create an Express server
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// config cors
+// Configure CORS
 app.use(cors());
 
-// convert data the body a object the json
+// Parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// loading config routes
+// Load routes
 app.use("/api/user", UserRoutes);
-app.use('/api/publication', PublicacionRoutes);
+app.use('/api/publication', PublicationRoutes);
 app.use('/api/follow', FollowRoutes);
 
-
-
-//router test
+// Test route
 app.get("/", (req, res) => {
-  res.status(200).json({
-    id: 1,
-    nombre: "yefferson",
-  });
+    res.status(200).json({
+        id: 1,
+        nombre: "yefferson",
+    });
 });
 
-// put server  listing petitions http
+// Global error handler
+app.use(errorHandler);
 
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
