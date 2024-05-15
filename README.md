@@ -125,7 +125,7 @@ User Endpoints
 - GET /api/publication/all/:page? - List all publications with pagination
 - PUT /api/publication/update/:id - Update a publication
 - GET /api/publication/search - Search publications
-- 
+  
 ## Follow Endpoints
 - POST /api/follow/save - Follow a user
 - DELETE /api/follow/unfollow/:id - Unfollow a user
