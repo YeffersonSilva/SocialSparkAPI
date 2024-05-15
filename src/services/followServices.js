@@ -1,61 +1,51 @@
 const Follow = require("../models/Follow");
 
+// Function to get the follow information for a user
 const followServices = async (userId) => {
-  const following = await Follow.find({ user: userId })
-    .select({ _id: 0, __v: 0, user: 0 })
-    .exec()
-    .then((follows) => {
-      return follows;
-    })
-    .catch((err) => {
-      return handleError(err);
-    });
+    try {
+        // Get the users that the given user is following
+        const following = await Follow.find({ user: userId })
+            .select("followed -_id")
+            .exec();
 
-  const followed = await Follow.find({ followed: userId })
-    .select({ _id: 0, __v: 0, followed: 0 })
-    .exec()
-    .then((follows) => {
-      return follows;
-    })
-    .catch((err) => {
-      return handleError(err);
-    });
+        // Get the users that are following the given user
+        const followed = await Follow.find({ followed: userId })
+            .select("user -_id")
+            .exec();
 
-  
-  const followers = await Follow.find({ followed: userId })
-    .select({ "user": 1, "_id": 0 })
-    .exec()
-    .then((follows) => {
-      return follows;
-    })
-    .catch((err) => {
-      return handleError(err);
-    });
-  const followingClean = [];
+        // Clean the results to return only user IDs
+        const followingClean = following.map(follow => follow.followed);
+        const followedClean = followed.map(follow => follow.user);
 
-  following.forEach((follow) => {
-    followingClean.push(follow.followed);
-  });
-
-  const followedClean = [];
-
-  followed.forEach((follow) => {
-    followedClean.push(follow.user);
-  });
-
-  return res.status(200).send({ status: "success", following: followingClean, followed: followedClean, followers: followers });
+        return {
+            following: followingClean,
+            followed: followedClean,
+            followers: followed
+        };
+    } catch (err) {
+        console.error(err);
+        throw new Error("Error fetching follow data");
+    }
 };
 
+// Function to check if a user is following another user
 const followThisUser = async (identify, profileUserid) => {
+    try {
+        // Check if the user is following the profile user
+        const following = await Follow.findOne({ user: identify, followed: profileUserid })
+            .select("followed -_id")
+            .exec();
 
-  let following = await Follow.findOne({ "user": identify, "followed": profileUserid })
-    .select({ "followed": 1, "_id": 0 })
-    .exec()
-  
-  let follower = await Follow.findOne({ "user": profileUserid, "followed": identify })
-    .select({ "user": 1, "_id": 0 })
-    .exec()
- return { following, follower } 
-}
+        // Check if the profile user is following the user
+        const follower = await Follow.findOne({ user: profileUserid, followed: identify })
+            .select("user -_id")
+            .exec();
 
-module.exports = { followServices, followThisUser}
+        return { following, follower };
+    } catch (err) {
+        console.error(err);
+        throw new Error("Error checking follow status");
+    }
+};
+
+module.exports = { followServices, followThisUser };
