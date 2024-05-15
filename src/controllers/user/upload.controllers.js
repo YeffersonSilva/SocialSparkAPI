@@ -2,35 +2,34 @@ const fs = require("fs");
 const User = require("../../models/User");
 
 exports.upload = (req, res) => {
-  if (!req.file && !req.files) {
+  if (!req.file) {
     return res.status(400).json({
+      status: "error",
       message: "No files uploaded",
     });
   }
-  let images = req.file.originalname;
 
-  const imageSplit = images.split(".");
+  // Split the filename to get the extension
+  const imageSplit = req.file.originalname.split(".");
   const extension = imageSplit[imageSplit.length - 1];
 
-  if (extension !== "png" && extension !== "jpg" && extension !== "jpeg") {
-    const filePath = req.filePath;
-    const fileDelete = fs.unlinkSync(filePath);
-
+  // Validate the file extension
+  if (!["png", "jpg", "jpeg"].includes(extension)) {
+    fs.unlinkSync(req.file.path);
     return res.status(400).json({
       status: "error",
       message: "Invalid file format",
     });
   }
 
-  User.findOneAndUpdate(
-    { _id: req.user._id },
+  // Update the user's profile image
+  User.findByIdAndUpdate(
+    req.user._id,
     { image: req.file.filename },
     { new: true },
-    (err, user) => {
+    (err, userUpdated) => {
       if (err || !userUpdated) {
-        const filePath = req.filePath;
-        const fileDelete = fs.unlinkSync(filePath);
-
+        fs.unlinkSync(req.file.path);
         return res.status(400).json({
           status: "error",
           message: "User not found",
@@ -40,15 +39,8 @@ exports.upload = (req, res) => {
       return res.status(200).json({
         status: "success",
         message: "Image uploaded successfully",
-        user: user,
+        user: userUpdated,
       });
     }
   );
-
-  return res.status(200).json({
-    message: "Upload image",
-    user: req.user,
-    file: req.file,
-    files: req.files,
-  });
 };
