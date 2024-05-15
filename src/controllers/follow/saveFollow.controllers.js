@@ -1,31 +1,32 @@
 const Follow = require("../../models/Follow");
-const User = require("../../models/User");
 
-exports.saveFollow = (req, res) => {
-  const params = req.body;
-  const indenty = req.user;
+exports.saveFollow = async (req, res) => {
+  const userId = req.user.id;
+  const { followed } = req.body;
 
-  let userToFollow = new Follow({
-    user: indenty.id,
-    followed: params.followed,
-});
+  try {
+    // Check if the follow relationship already exists
+    const existingFollow = await Follow.findOne({ user: userId, followed });
+    if (existingFollow) {
+      return res.status(400).json({
+        status: "error",
+        message: "You are already following this user",
+      });
+    }
 
+    // Create a new follow relationship
+    const newFollow = new Follow({ user: userId, followed });
+    await newFollow.save();
 
-  userToFollow.save((err, followStored) => {
-    if (err)
-      return res
-        .status(500)
-        .send({ message: "Error al guardar el seguimiento" });
-    if (!followStored)
-      return res
-        .status(404)
-        .send({ message: "El seguimiento no se ha guardado" });
-
-    res.status(200).send({
-        message: "saveFollow controller works",
-        indenty: req.user,
-      follow: followStored
-      
+    return res.status(200).json({
+      status: "success",
+      message: "Follow saved successfully",
+      follow: newFollow,
     });
-  });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Error saving the follow",
+    });
+  }
 };
