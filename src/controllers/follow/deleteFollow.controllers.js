@@ -1,23 +1,28 @@
 const Follow = require("../../models/Follow");
-const User = require("../../models/User");
 
-exports.unfollow = (req, res) => {
-  //get the user id
-  const user = req.user;
+exports.unfollow = async (req, res) => {
+  const userId = req.user.id;
+  const followedId = req.params.id;
 
-  //get the user id unfollow
-  const followed = req.params.id;
-  // find the follow to delete
+  try {
+    // Find and remove the follow relationship
+    const follow = await Follow.findOneAndRemove({ user: userId, followed: followedId });
 
-  Follow.find({ user: user.id, followed: followed }).remove(
-    (err, followedDeleted) => {
-      if (err)
-        return res.status(500).send({ message: "Error al dejar de seguir" });
-      res.status(200).send({
-          message: "unfollow controller works",
-        
-     
+    if (!follow) {
+      return res.status(404).json({
+        status: "error",
+        message: "Follow relationship not found",
       });
     }
-  );
+
+    return res.status(200).json({
+      status: "success",
+      message: "You have unfollowed this user",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Error unfollowing the user",
+    });
+  }
 };
